@@ -54,21 +54,34 @@ function showResult(msg, cls) {
   el.className = cls;
   el.style.display = 'block';
 }
-function pythonJsonDumps(obj) {
+function buildFloatIntSet(rawText) {
+  // Python distinguishes 1.0 (float) from 1 (int), JavaScript does not.
+  // Scan the raw JSON text for numbers written as X.0 (float-valued integers).
+  // The signer uses Python json.dumps which preserves this distinction.
+  const floatInts = new Set();
+  const re = /:\s*(\d+)\.0\s*[,\}\]\s]/g;
+  let m;
+  while ((m = re.exec(rawText)) !== null) {
+    floatInts.add(parseInt(m[1]));
+  }
+  return floatInts;
+}
+function pythonJsonDumps(obj, floatInts) {
   if (obj === null) return 'null';
   if (typeof obj === 'boolean') return obj ? 'true' : 'false';
   if (typeof obj === 'number') {
+    if (Number.isInteger(obj) && floatInts && floatInts.has(obj)) return obj.toFixed(1);
     if (Number.isInteger(obj)) return obj.toString();
     return JSON.stringify(obj);
   }
   if (typeof obj === 'string') return JSON.stringify(obj);
   if (Array.isArray(obj)) {
-    const items = obj.map(item => pythonJsonDumps(item));
+    const items = obj.map(item => pythonJsonDumps(item, floatInts));
     return '[' + items.join(', ') + ']';
   }
   if (typeof obj === 'object') {
     const keys = Object.keys(obj).sort();
-    const pairs = keys.map(k => JSON.stringify(k) + ': ' + pythonJsonDumps(obj[k]));
+    const pairs = keys.map(k => JSON.stringify(k) + ': ' + pythonJsonDumps(obj[k], floatInts));
     return '{' + pairs.join(', ') + '}';
   }
   return String(obj);
@@ -90,7 +103,8 @@ async function verify() {
     if (!content_hash || !sig) { showResult('Attestation block is incomplete (missing content_hash or sig).', 'invalid'); return; }
     const contentObj = { ...json };
     delete contentObj.attestation;
-    const contentStr = pythonJsonDumps(contentObj);
+    const floatInts = buildFloatIntSet(input);
+    const contentStr = pythonJsonDumps(contentObj, floatInts);
     const encoder = new TextEncoder();
     const contentBytes = encoder.encode(contentStr);
     const hashBuffer = await crypto.subtle.digest('SHA-256', contentBytes);
