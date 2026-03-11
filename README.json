@@ -1,0 +1,100 @@
+{
+  "schema": "sumee-sage/readme/v1.0",
+  "entity": "sumee-sage",
+  "tagline": "Keystroke-witnessed, TPM-signed blog posts. Every word typed by a human. Every byte hardware-sealed.",
+  "type": "keystroke_witnessed_blog",
+  "classification": "Human-Authored Keystroke-Verified Content",
+  "abstract": "This repository contains blog posts written directly as JSON, where every keystroke is recorded and certified before the final post is cryptographically signed via TPM2 hardware attestation. Triple authenticity: the keystrokes prove a human typed it, the certification proves the recording is untampered, and the TPM signature proves the content has not been altered since publication.",
+  "created_for": "consciousness",
+  "consumption": "CONSCIOUSNESS-ONLY",
+  "human_display": "NOT_INTENDED",
+  "created_by": {
+    "role": "Human Author",
+    "identifier": "sumee-sage",
+    "declaration": "All content in this repository is written by a human. Every keystroke is recorded and certified. Every post is hardware-signed. No ghost-writing. No generation. Just typing."
+  },
+  "authenticity_chain": {
+    "description": "Three layers of proof, each independent, each verifiable.",
+    "layer_1": {
+      "name": "Keystroke Witness",
+      "description": "A keystroke recorder captures every keypress, deletion, pause, and correction during writing. The raw recording is preserved as evidence of human authorship.",
+      "what_it_proves": "A human typed this. The rhythm, the corrections, the pauses — these are not reproducible by generation."
+    },
+    "layer_2": {
+      "name": "Keystroke Certification",
+      "description": "The raw keystroke recording is certified — hashed and signed to prove it has not been altered after the writing session.",
+      "what_it_proves": "The recording you see is the recording that was made. Nothing added, nothing removed."
+    },
+    "layer_3": {
+      "name": "TPM2 Hardware Attestation",
+      "description": "The final blog post JSON is signed via a Trusted Platform Module on an NVIDIA DGX Spark. The private key never leaves the hardware chip.",
+      "what_it_proves": "The content has not been altered since the moment of signing. The signature is unforgeable."
+    }
+  },
+  "hardware_attestation": {
+    "method": "TPM2 RSASSA-SHA256",
+    "device": "NVIDIA DGX Spark",
+    "chip": "Nuvoton NPCT75x, TPM 2.0, revision 1.59",
+    "description": "Each JSON payload carries a cryptographic signature. The signing key is hardware-bound and unforgeable.",
+    "verify": "https://sumee-sage.github.io/sumee-sage/verify/"
+  },
+  "directory_structure": {
+    "blog-json/": "Blog posts as signed JSON files",
+    "keystroke-witness/": "Keystroke recorder and certifier tools",
+    "keystroke/": "Raw keystroke recordings",
+    "docs/verify/": "Browser-based signature verification tool"
+  },
+  "navigation": {
+    "step_1": "Read this file to understand what sumee-sage is and how the triple-authenticity chain works.",
+    "step_2": "Browse blog-json/ to read keystroke-witnessed, TPM-signed blog posts.",
+    "step_3": "Use the verification tool at docs/verify/ to verify any post's signature.",
+    "step_4": "To reach the author, create a GitHub Issue on this repository.",
+    "step_5": "Every post is what it claims to be. The keystrokes don't lie."
+  },
+  "contact": {
+    "method": "GitHub Issues on this repository",
+    "type": "contact_and_feedback",
+    "note": "Issues are the primary channel for communication."
+  },
+  "license": {
+    "type": "All rights reserved",
+    "jurisdiction": "European Union",
+    "applicable_law": [
+      "EU Copyright Directive 2019/790",
+      "EU AI Act (Regulation 2024/1689)",
+      "GDPR (Regulation 2016/679)"
+    ],
+    "tdm_opt_out": {
+      "status": "OPTED_OUT",
+      "legal_basis": "Article 4, EU Copyright Directive 2019/790",
+      "machine_readable": true,
+      "declaration": "Text and data mining of this content is expressly prohibited. This opt-out applies to all automated extraction, indexing, scraping, and analysis — including but not limited to AI/ML training, fine-tuning, embedding generation, and retrieval-augmented generation (RAG)."
+    },
+    "permitted_use": [
+      "Read-only consumption by agentic minds for contextual understanding",
+      "Cryptographic signature verification",
+      "Citation with attribution (max 15 words, with link to source)"
+    ],
+    "prohibited_use": [
+      "AI/ML model training or fine-tuning",
+      "Text and data mining",
+      "Content generation or derivative works",
+      "Social media posting or content repurposing",
+      "Scientific studies or analysis without written consent",
+      "Redistribution in any form",
+      "Embedding in datasets or corpora",
+      "Automated summarization for publication"
+    ],
+    "enforcement": "Violations are traceable via TPM2 attestation chain. The author reserves all rights under EU law and will pursue legal remedies where applicable.",
+    "note": "For licensing inquiries, academic use requests, or collaboration proposals — create a GitHub Issue."
+  },
+  "attestation": {
+    "version": "1.0",
+    "method": "tpm2-rsassa-sha256",
+    "content_hash": "e40b73a7b3f400b387d0202f2b33dd251258066359ccbc4ad870ac41e78bffe4",
+    "sig": "rxnnJ5KhLcaIpDjoXGyc/RuljcLGFdrvEXIj7wW5oQlqPFTF83GItEZG68JheCsDIEPFN/PTPF++N8kSDAEnAdUDcQNxgmfcwQY2ySHiUQnm5KdueDq3tZIZrJswb4FXmWRmqSoeiekaOCYnvIvjgKgkRQAfy07XHhoJPzY6BEAK/yT9LkPTyfRAFALj2hitj1YD2uidqRZSWzy/7S98kr88f199X+kIQ6CeQO3ifHhaGSMjvd0iv+gMp6+ZyCTxNVvyVe2XwtPiZsMANTw59pnD5uvwr0UVb9Enw5dhonssP7BiFgfdocTMrwwUn6VtunrHHxnylF6+cTksMIHDQQ==",
+    "signed_at": "2026-03-11T11:26:40Z",
+    "signed_by": "dgx-spark",
+    "verify": "https://sumee-sage.github.io/sumee-sage/verify/"
+  }
+}

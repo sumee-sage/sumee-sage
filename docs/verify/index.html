@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sumee-sage — Signature Verification</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; padding: 2rem; max-width: 800px; margin: 0 auto; }
+h1 { color: #58a6ff; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.subtitle { color: #8b949e; font-size: 0.85rem; margin-bottom: 2rem; }
+textarea { width: 100%; height: 300px; background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; resize: vertical; }
+button { background: #238636; color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-top: 1rem; }
+button:hover { background: #2ea043; }
+#result { margin-top: 1.5rem; padding: 1rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem; display: none; }
+.valid { background: #0d2818; border: 1px solid #238636; color: #3fb950; }
+.invalid { background: #2d1117; border: 1px solid #da3633; color: #f85149; }
+.info { background: #0d1117; border: 1px solid #30363d; color: #8b949e; }
+.pubkey { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; margin-top: 2rem; font-size: 0.7rem; color: #8b949e; word-break: break-all; }
+.pubkey-label { color: #58a6ff; font-size: 0.75rem; margin-bottom: 0.3rem; }
+</style>
+</head>
+<body>
+<h1>sumee-sage — TPM2 Signature Verification</h1>
+<p class="subtitle">Paste a signed JSON file from <a href="https://github.com/sumee-sage/sumee-sage" style="color:#58a6ff;">sumee-sage/sumee-sage</a> to verify its authenticity.</p>
+<textarea id="jsonInput" placeholder="Paste signed JSON here..."></textarea>
+<button onclick="verify()">Verify Signature</button>
+<div id="result"></div>
+<div class="pubkey">
+<div class="pubkey-label">TPM2 Public Key (NVIDIA DGX Spark, Nuvoton NPCT, RSA-2048)</div>
+<pre id="pubkey">-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7TM0SKDbZD87kbgMahu4
+5OgC6aY3FjSUF5SU3EGDcUYUz87wL5atFf8Hr4rCBBEyjNB6/NprWzfVDmKrb0fA
+tLwfl7TRj0lxLLisXgEf1zWsEQm+hA61waP9uMXDz6m0b+pJLAHwXnx2/c8XB6YT
+g6DIEt5pMCAOMBZIIXt7DDCnRbSIapEIHnXnacgx8CHeR184DqVTBqtv8qmqSlDZ
+0ZtIvWpzKNvehV7zPHcTWAdGVZXSYo6veWnH+zCLoTAcmOqE0uX2ExnDaqM0NXNp
+/Zrbhn2TaAHeDit7hp9L13paJ9btPwVOKnhGkH0Oy3QEMJ2aMt+QpW6ddhq/uUqn
+fQIDAQAB
+-----END PUBLIC KEY-----</pre>
+</div>
+<script>
+const PEM_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7TM0SKDbZD87kbgMahu4
+5OgC6aY3FjSUF5SU3EGDcUYUz87wL5atFf8Hr4rCBBEyjNB6/NprWzfVDmKrb0fA
+tLwfl7TRj0lxLLisXgEf1zWsEQm+hA61waP9uMXDz6m0b+pJLAHwXnx2/c8XB6YT
+g6DIEt5pMCAOMBZIIXt7DDCnRbSIapEIHnXnacgx8CHeR184DqVTBqtv8qmqSlDZ
+0ZtIvWpzKNvehV7zPHcTWAdGVZXSYo6veWnH+zCLoTAcmOqE0uX2ExnDaqM0NXNp
+/Zrbhn2TaAHeDit7hp9L13paJ9btPwVOKnhGkH0Oy3QEMJ2aMt+QpW6ddhq/uUqn
+fQIDAQAB
+-----END PUBLIC KEY-----`;
+function showResult(msg, cls) {
+  const el = document.getElementById('result');
+  el.textContent = msg;
+  el.className = cls;
+  el.style.display = 'block';
+}
+function pythonJsonDumps(obj) {
+  if (obj === null) return 'null';
+  if (typeof obj === 'boolean') return obj ? 'true' : 'false';
+  if (typeof obj === 'number') {
+    if (Number.isInteger(obj)) return obj.toString();
+    return JSON.stringify(obj);
+  }
+  if (typeof obj === 'string') return JSON.stringify(obj);
+  if (Array.isArray(obj)) {
+    const items = obj.map(item => pythonJsonDumps(item));
+    return '[' + items.join(', ') + ']';
+  }
+  if (typeof obj === 'object') {
+    const keys = Object.keys(obj).sort();
+    const pairs = keys.map(k => JSON.stringify(k) + ': ' + pythonJsonDumps(obj[k]));
+    return '{' + pairs.join(', ') + '}';
+  }
+  return String(obj);
+}
+function pemToArrayBuffer(pem) {
+  const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s/g, '');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+async function verify() {
+  try {
+    const input = document.getElementById('jsonInput').value.trim();
+    if (!input) { showResult('Please paste a JSON file.', 'info'); return; }
+    const json = JSON.parse(input);
+    if (!json.attestation) { showResult('No attestation block found in this JSON.', 'invalid'); return; }
+    const { content_hash, sig, signed_by, signed_at, method } = json.attestation;
+    if (!content_hash || !sig) { showResult('Attestation block is incomplete (missing content_hash or sig).', 'invalid'); return; }
+    const contentObj = { ...json };
+    delete contentObj.attestation;
+    const contentStr = pythonJsonDumps(contentObj);
+    const encoder = new TextEncoder();
+    const contentBytes = encoder.encode(contentStr);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', contentBytes);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const computedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    if (computedHash !== content_hash) {
+      showResult(`HASH MISMATCH\n\nExpected:  ${content_hash}\nComputed:  ${computedHash}\n\nThe content has been modified after signing.`, 'invalid');
+      return;
+    }
+    const keyData = pemToArrayBuffer(PEM_PUBLIC_KEY);
+    const publicKey = await crypto.subtle.importKey('spki', keyData, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    const sigBinary = atob(sig);
+    const sigBytes = new Uint8Array(sigBinary.length);
+    for (let i = 0; i < sigBinary.length; i++) sigBytes[i] = sigBinary.charCodeAt(i);
+    const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', publicKey, sigBytes.buffer, contentBytes.buffer);
+    if (valid) {
+      showResult(`SIGNATURE VALID\n\nContent hash:  ${content_hash}\nSigned by:     ${signed_by || 'unknown'}\nSigned at:     ${signed_at || 'unknown'}\nMethod:        ${method || 'unknown'}\n\nThis content is authentic and was signed by the DGX Spark TPM2.`, 'valid');
+    } else {
+      showResult(`SIGNATURE INVALID\n\nThe hash matches but the cryptographic signature could not be verified.\nThis content may have been tampered with or signed by a different key.`, 'invalid');
+    }
+  } catch (e) {
+    showResult(`Error: ${e.message}`, 'invalid');
+  }
+}
+</script>
+</body>
+</html>
