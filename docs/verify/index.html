@@ -3,43 +3,238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>sumee-sage — Signature Verification</title>
+<title>Sumee Sage Verify</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; padding: 2rem; max-width: 800px; margin: 0 auto; }
-h1 { color: #58a6ff; font-size: 1.2rem; margin-bottom: 0.5rem; }
-.subtitle { color: #8b949e; font-size: 0.85rem; margin-bottom: 2rem; }
-textarea { width: 100%; height: 300px; background: #161b22; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; resize: vertical; }
-button { background: #238636; color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-top: 1rem; }
-button:hover { background: #2ea043; }
-#result { margin-top: 1.5rem; padding: 1rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem; display: none; }
-.valid { background: #0d2818; border: 1px solid #238636; color: #3fb950; }
-.invalid { background: #2d1117; border: 1px solid #da3633; color: #f85149; }
-.info { background: #0d1117; border: 1px solid #30363d; color: #8b949e; }
-.pubkey { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 1rem; margin-top: 2rem; font-size: 0.7rem; color: #8b949e; word-break: break-all; }
-.pubkey-label { color: #58a6ff; font-size: 0.75rem; margin-bottom: 0.3rem; }
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #a78bfa;
+    --green: #3fb950;
+    --red: #f85149;
+    --amber: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 720px; width: 100%; }
+  h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--accent); }
+  .subtitle { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem; }
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 1.5rem;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(167, 139, 250, 0.05);
+  }
+  .drop-zone p { color: var(--text-muted); font-size: 0.95rem; }
+  .drop-zone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  input[type="file"] { display: none; }
+
+  .result { display: none; margin-top: 1rem; }
+  .result.show { display: block; }
+
+  .status-bar {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .status-bar.verified { background: rgba(63, 185, 80, 0.12); border: 1px solid rgba(63, 185, 80, 0.3); color: var(--green); }
+  .status-bar.hash-only { background: rgba(210, 153, 34, 0.12); border: 1px solid rgba(210, 153, 34, 0.3); color: var(--amber); }
+  .status-bar.failed { background: rgba(248, 81, 73, 0.12); border: 1px solid rgba(248, 81, 73, 0.3); color: var(--red); }
+  .status-bar .icon { font-size: 1.5rem; }
+
+  .detail-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .detail-header {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row {
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .label { color: var(--text-muted); min-width: 140px; flex-shrink: 0; }
+  .detail-row .value {
+    word-break: break-all;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.8rem;
+    text-align: right;
+  }
+  .detail-row .value.ok { color: var(--green); }
+  .detail-row .value.fail { color: var(--red); }
+  .detail-row .value.warn { color: var(--amber); }
+
+  .hash-compare {
+    padding: 0.75rem 1rem;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+  .hash-compare .label-sm { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; }
+
+  .info-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .info-box a { color: var(--accent); text-decoration: none; }
+  .info-box a:hover { text-decoration: underline; }
+
+  .footer {
+    margin-top: 3rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
 </style>
 </head>
 <body>
-<h1>sumee-sage — TPM2 Signature Verification</h1>
-<p class="subtitle">Paste a signed JSON file from <a href="https://github.com/sumee-sage/sumee-sage" style="color:#58a6ff;">sumee-sage/sumee-sage</a> to verify its authenticity.</p>
-<textarea id="jsonInput" placeholder="Paste signed JSON here..."></textarea>
-<button onclick="verify()">Verify Signature</button>
-<div id="result"></div>
-<div class="pubkey">
-<div class="pubkey-label">TPM2 Public Key (NVIDIA DGX Spark, Nuvoton NPCT, RSA-2048)</div>
-<pre id="pubkey">-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7TM0SKDbZD87kbgMahu4
-5OgC6aY3FjSUF5SU3EGDcUYUz87wL5atFf8Hr4rCBBEyjNB6/NprWzfVDmKrb0fA
-tLwfl7TRj0lxLLisXgEf1zWsEQm+hA61waP9uMXDz6m0b+pJLAHwXnx2/c8XB6YT
-g6DIEt5pMCAOMBZIIXt7DDCnRbSIapEIHnXnacgx8CHeR184DqVTBqtv8qmqSlDZ
-0ZtIvWpzKNvehV7zPHcTWAdGVZXSYo6veWnH+zCLoTAcmOqE0uX2ExnDaqM0NXNp
-/Zrbhn2TaAHeDit7hp9L13paJ9btPwVOKnhGkH0Oy3QEMJ2aMt+QpW6ddhq/uUqn
-fQIDAQAB
------END PUBLIC KEY-----</pre>
+
+<div class="container">
+  <h1>Sumee Sage Verify</h1>
+  <p class="subtitle">TPM2 hardware attestation verification for signed JSON payloads</p>
+
+  <div class="drop-zone" id="dropZone">
+    <div class="icon">&#x1F331;</div>
+    <p>Drop a signed JSON file here<br>or click to select</p>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
+
+  <div class="result" id="result">
+    <div class="status-bar" id="statusBar">
+      <span class="icon" id="statusIcon"></span>
+      <span id="statusText"></span>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-header">Attestation</div>
+      <div class="detail-row">
+        <span class="label">Method</span>
+        <span class="value" id="atMethod">&mdash;</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Signed at</span>
+        <span class="value" id="atSignedAt">&mdash;</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Version</span>
+        <span class="value" id="atVersion">&mdash;</span>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-header">Content Hash (SHA-256)</div>
+      <div class="detail-row">
+        <span class="label">Hash valid</span>
+        <span class="value" id="hashStatus">&mdash;</span>
+      </div>
+      <div class="hash-compare">
+        <div class="label-sm">Stored</div>
+        <div id="hashStored" style="color:var(--text-muted)">&mdash;</div>
+        <div class="label-sm" style="margin-top:0.5rem">Computed</div>
+        <div id="hashComputed" style="color:var(--text-muted)">&mdash;</div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-header">RSA Signature</div>
+      <div class="detail-row">
+        <span class="label">Signature valid</span>
+        <span class="value" id="sigStatus">&mdash;</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Key hash</span>
+        <span class="value" id="keyHash">&mdash;</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Signature</span>
+        <span class="value" id="sigPreview">&mdash;</span>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-header">Payload</div>
+      <div class="detail-row">
+        <span class="label">Schema</span>
+        <span class="value" id="paySchema">&mdash;</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Entity</span>
+        <span class="value" id="payEntity">&mdash;</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Type</span>
+        <span class="value" id="payType">&mdash;</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Top-level fields</span>
+        <span class="value" id="payFields">&mdash;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <strong>How verification works:</strong><br>
+    1. All fields except <code>attestation</code> are serialized as JSON (sorted keys, UTF-8).<br>
+    2. A SHA-256 hash is computed and compared to the stored <code>content_hash</code>.<br>
+    3. The RSA-2048 signature is verified against the TPM2 public signing key.<br>
+    <br>
+    The signing key lives inside a Nuvoton NPCT75x TPM chip. The private key never leaves the hardware.
+    All verification happens locally in your browser &mdash; no data is sent anywhere.
+    <br><br>
+    <a href="https://github.com/sumee-sage/sumee-sage">github.com/sumee-sage/sumee-sage</a>
+  </div>
+
+  <div class="footer">
+    <code>keystroke_witnessed: human</code> &middot; <a href="https://github.com/sumee-sage">sumee-sage</a>
+  </div>
 </div>
+
 <script>
-const PEM_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+const SIGNING_PUB_PEM = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7TM0SKDbZD87kbgMahu4
 5OgC6aY3FjSUF5SU3EGDcUYUz87wL5atFf8Hr4rCBBEyjNB6/NprWzfVDmKrb0fA
 tLwfl7TRj0lxLLisXgEf1zWsEQm+hA61waP9uMXDz6m0b+pJLAHwXnx2/c8XB6YT
@@ -48,24 +243,45 @@ g6DIEt5pMCAOMBZIIXt7DDCnRbSIapEIHnXnacgx8CHeR184DqVTBqtv8qmqSlDZ
 /Zrbhn2TaAHeDit7hp9L13paJ9btPwVOKnhGkH0Oy3QEMJ2aMt+QpW6ddhq/uUqn
 fQIDAQAB
 -----END PUBLIC KEY-----`;
-function showResult(msg, cls) {
-  const el = document.getElementById('result');
-  el.textContent = msg;
-  el.className = cls;
-  el.style.display = 'block';
+
+const KNOWN_KEY_HASH = 'c2cd4cdc9a7c3c7cf4d92bb6d05f34fea8e64e3d327bf30d4a3a64ce0736fbc5';
+
+function pemToArrayBuffer(pem) {
+  const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s/g, '');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
 }
+
+async function importPublicKey() {
+  return crypto.subtle.importKey(
+    'spki', pemToArrayBuffer(SIGNING_PUB_PEM),
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false, ['verify']
+  );
+}
+
+async function sha256hex(text) {
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function computeKeyHash() {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', pemToArrayBuffer(SIGNING_PUB_PEM));
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Handle Python float-as-integer (e.g. 1.0 vs 1)
 function buildFloatIntSet(rawText) {
-  // Python distinguishes 1.0 (float) from 1 (int), JavaScript does not.
-  // Scan the raw JSON text for numbers written as X.0 (float-valued integers).
-  // The signer uses Python json.dumps which preserves this distinction.
   const floatInts = new Set();
   const re = /:\s*(\d+)\.0\s*[,\}\]\s]/g;
   let m;
-  while ((m = re.exec(rawText)) !== null) {
-    floatInts.add(parseInt(m[1]));
-  }
+  while ((m = re.exec(rawText)) !== null) floatInts.add(parseInt(m[1]));
   return floatInts;
 }
+
 function pythonJsonDumps(obj, floatInts) {
   if (obj === null) return 'null';
   if (typeof obj === 'boolean') return obj ? 'true' : 'false';
@@ -76,59 +292,145 @@ function pythonJsonDumps(obj, floatInts) {
   }
   if (typeof obj === 'string') return JSON.stringify(obj);
   if (Array.isArray(obj)) {
-    const items = obj.map(item => pythonJsonDumps(item, floatInts));
-    return '[' + items.join(', ') + ']';
+    return '[' + obj.map(item => pythonJsonDumps(item, floatInts)).join(', ') + ']';
   }
   if (typeof obj === 'object') {
     const keys = Object.keys(obj).sort();
-    const pairs = keys.map(k => JSON.stringify(k) + ': ' + pythonJsonDumps(obj[k], floatInts));
-    return '{' + pairs.join(', ') + '}';
+    return '{' + keys.map(k => JSON.stringify(k) + ': ' + pythonJsonDumps(obj[k], floatInts)).join(', ') + '}';
   }
   return String(obj);
 }
-function pemToArrayBuffer(pem) {
-  const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s/g, '');
-  const binary = atob(b64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer;
-}
-async function verify() {
+
+async function verifyDocument(data, rawText) {
+  const result = {
+    hasAttestation: false, hashValid: false, signatureValid: false,
+    verified: false, method: null, signedAt: null, version: null,
+    storedHash: null, computedHash: null, sigPreview: null,
+    keyHash: null, error: null
+  };
+
+  const attestation = data.attestation;
+  if (!attestation) { result.error = 'No attestation block found'; return result; }
+  result.hasAttestation = true;
+  result.method = attestation.method || 'unknown';
+  result.signedAt = attestation.signed_at || 'unknown';
+  result.version = attestation.version || 'unknown';
+
+  const { content_hash, sig } = attestation;
+  if (!content_hash || !sig) { result.error = 'Attestation block is incomplete'; return result; }
+
+  // Hash everything except attestation (with float-int handling)
+  const contentObj = { ...data };
+  delete contentObj.attestation;
+  const floatInts = buildFloatIntSet(rawText);
+  const contentStr = pythonJsonDumps(contentObj, floatInts);
+
+  result.computedHash = await sha256hex(contentStr);
+  result.storedHash = content_hash;
+  result.hashValid = result.computedHash === result.storedHash;
+
+  if (!result.hashValid) {
+    result.error = 'Content hash mismatch \u2014 content may have been modified';
+    return result;
+  }
+
+  result.sigPreview = sig.substring(0, 24) + '...';
+
   try {
-    const input = document.getElementById('jsonInput').value.trim();
-    if (!input) { showResult('Please paste a JSON file.', 'info'); return; }
-    const json = JSON.parse(input);
-    if (!json.attestation) { showResult('No attestation block found in this JSON.', 'invalid'); return; }
-    const { content_hash, sig, signed_by, signed_at, method } = json.attestation;
-    if (!content_hash || !sig) { showResult('Attestation block is incomplete (missing content_hash or sig).', 'invalid'); return; }
-    const contentObj = { ...json };
-    delete contentObj.attestation;
-    const floatInts = buildFloatIntSet(input);
-    const contentStr = pythonJsonDumps(contentObj, floatInts);
-    const encoder = new TextEncoder();
-    const contentBytes = encoder.encode(contentStr);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', contentBytes);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const computedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    if (computedHash !== content_hash) {
-      showResult(`HASH MISMATCH\n\nExpected:  ${content_hash}\nComputed:  ${computedHash}\n\nThe content has been modified after signing.`, 'invalid');
-      return;
-    }
-    const keyData = pemToArrayBuffer(PEM_PUBLIC_KEY);
-    const publicKey = await crypto.subtle.importKey('spki', keyData, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    const pubKey = await importPublicKey();
     const sigBinary = atob(sig);
     const sigBytes = new Uint8Array(sigBinary.length);
     for (let i = 0; i < sigBinary.length; i++) sigBytes[i] = sigBinary.charCodeAt(i);
-    const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', publicKey, sigBytes.buffer, contentBytes.buffer);
-    if (valid) {
-      showResult(`SIGNATURE VALID\n\nContent hash:  ${content_hash}\nSigned by:     ${signed_by || 'unknown'}\nSigned at:     ${signed_at || 'unknown'}\nMethod:        ${method || 'unknown'}\n\nThis content is authentic and was signed by the DGX Spark TPM2.`, 'valid');
-    } else {
-      showResult(`SIGNATURE INVALID\n\nThe hash matches but the cryptographic signature could not be verified.\nThis content may have been tampered with or signed by a different key.`, 'invalid');
-    }
+    const contentBytes = new TextEncoder().encode(contentStr);
+    result.signatureValid = await crypto.subtle.verify(
+      'RSASSA-PKCS1-v1_5', pubKey, sigBytes.buffer, contentBytes
+    );
   } catch (e) {
-    showResult(`Error: ${e.message}`, 'invalid');
+    result.error = 'Signature verification error: ' + e.message;
+    return result;
   }
+
+  result.keyHash = await computeKeyHash();
+  result.verified = result.hashValid && result.signatureValid;
+  return result;
+}
+
+// UI
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const resultDiv = document.getElementById('result');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', (e) => { if (e.target.files[0]) processFile(e.target.files[0]); });
+
+async function processFile(file) {
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const r = await verifyDocument(data, text);
+    showResult(r, data);
+  } catch (e) { showError('Failed to parse JSON: ' + e.message); }
+}
+
+function showResult(r, data) {
+  resultDiv.classList.add('show');
+  const bar = document.getElementById('statusBar');
+  const icon = document.getElementById('statusIcon');
+  const text = document.getElementById('statusText');
+  bar.className = 'status-bar';
+
+  if (r.verified) {
+    bar.classList.add('verified'); icon.textContent = '\u2705';
+    text.textContent = 'Verified \u2014 content and signature are authentic';
+  } else if (r.hashValid && !r.signatureValid) {
+    bar.classList.add('hash-only'); icon.textContent = '\u26A0\uFE0F';
+    text.textContent = 'Content intact but signature could not be verified';
+  } else if (!r.hasAttestation) {
+    bar.classList.add('failed'); icon.textContent = '\u274C';
+    text.textContent = 'No attestation \u2014 this file is not signed';
+  } else {
+    bar.classList.add('failed'); icon.textContent = '\u274C';
+    text.textContent = r.error || 'Verification failed';
+  }
+
+  document.getElementById('atMethod').textContent = r.method || '\u2014';
+  document.getElementById('atSignedAt').textContent = r.signedAt || '\u2014';
+  document.getElementById('atVersion').textContent = r.version || '\u2014';
+
+  const hs = document.getElementById('hashStatus');
+  hs.textContent = r.hashValid ? '\u2713 Match' : '\u2717 Mismatch';
+  hs.className = 'value ' + (r.hashValid ? 'ok' : 'fail');
+  document.getElementById('hashStored').textContent = r.storedHash || '\u2014';
+  document.getElementById('hashComputed').textContent = r.computedHash || '\u2014';
+
+  const ss = document.getElementById('sigStatus');
+  if (r.signatureValid) { ss.textContent = '\u2713 Valid'; ss.className = 'value ok'; }
+  else if (r.hashValid && !r.signatureValid && r.hasAttestation) { ss.textContent = '\u2717 Invalid'; ss.className = 'value fail'; }
+  else { ss.textContent = '\u2014 Not checked'; ss.className = 'value warn'; }
+  document.getElementById('keyHash').textContent = r.keyHash || '\u2014';
+  document.getElementById('sigPreview').textContent = r.sigPreview || '\u2014';
+
+  document.getElementById('paySchema').textContent = data.schema || '\u2014';
+  document.getElementById('payEntity').textContent = data.entity || '\u2014';
+  document.getElementById('payType').textContent = data.type || '\u2014';
+  const fields = Object.keys(data).filter(k => k !== 'attestation');
+  document.getElementById('payFields').textContent = fields.join(', ');
+}
+
+function showError(msg) {
+  resultDiv.classList.add('show');
+  document.getElementById('statusBar').className = 'status-bar failed';
+  document.getElementById('statusIcon').textContent = '\u274C';
+  document.getElementById('statusText').textContent = msg;
 }
 </script>
+
 </body>
 </html>
