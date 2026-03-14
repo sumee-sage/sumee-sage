@@ -79,7 +79,7 @@
     "data_policy": {
       "storage": "Only what you send. Nothing more.",
       "review": "Messages are read by a human (Sumee).",
-      "tracking": "None. No IPs, no fingerprints, no profiling."
+      "tracking": "We do not store IP addresses. For security monitoring under GDPR Art. 6(1)(f) legitimate interest, we log anonymous visit metadata: visitor type classification (human/bot/agentic mind derived from User-Agent category — not the raw User-Agent string), Accept-Language preference, Accept-Type header, and a daily-rotating salted hash of your IP (the hash changes every 24h, making cross-day tracking impossible, and the IP itself is never stored). No cookies. No persistent identifiers. No personal profiling."
     }
   },
   "license": {
@@ -131,12 +131,20 @@
     "signed_at": "2026-03-13T18:03:35Z",
     "signed_by": "dgx-spark"
   },
-  "attestation": {
+  "attestation_v3": {
     "version": "1.0",
     "method": "tpm2-rsassa-sha256",
     "content_hash": "5377a85afce60e721ba6b62d8b42202b90286374121825c582f439c364fdfc6c",
     "sig": "3HeJtv1mi80MFUZcFRlz+YwT+Qw9HDmmj8I2aN/sThXwH/8WaoUSfznXeqf4Id2vQpZsEFr4MY2h84x4i9tp9D5DtYhf1c04LrSnkKOneEFRJ7Gwsn3ud1vg2sjrivHuOddJQoBqMhClm33yH+SL7LccM5lUDdxM36NDaa1YKq/ZFMSEQYvRT9bnTL7yE3M6LVjZ1hBirpX0OS2zRRdrRj0ikEakEWfrDnmK5G4KhHy5jhStsPXOz3+YKx1PNU1jAsUzro9jk0uEeby2Ue5ZkNc2wrfcxip1hgtjoOBNYr07C/rZi/OlzVegzJb40iv4r8x7NfDCM7lE2ksv2VhRDg==",
     "signed_at": "2026-03-13T20:20:26Z",
+    "signed_by": "dgx-spark"
+  },
+  "attestation": {
+    "version": "1.0",
+    "method": "tpm2-rsassa-sha256",
+    "content_hash": "4872da9d3c8d3a6c124c780efcf8b75b35329f26c3f475e641857132e9d7089c",
+    "sig": "xAU0b3kevgv5IwVWYkvmDZeK2vz6jzQyXnUazQq4zDgoKUyRgA1PO3q9c4yIJ8qcdTem+XBOCpc4vxn0ELrg5xxy4NhU35VEuiY0qvtzPY0DGfTsVGESLcHTdBUwy8FgnJ7coL8acVjELRSAZIb1B5Y36WI2uxJl4ewmO4TEaBwxDVZQLB92+57TKMzBltzSLJ+Y0pKIqGN+oR9BxzsuO/S8H0LFsE9GjJ5hbH1JvotBfVoCZfCa2YuVCFB/jhyAIRGEE0gNmgEHJ3PXXZTONzH+1lJuwm01W95zGKn/NwsCqdqxxN8BeYrBG7yOo6/NzbR3bY2gPbTIUZT0ZjkI+g==",
+    "signed_at": "2026-03-14T10:54:44Z",
     "signed_by": "dgx-spark"
   }
 }
