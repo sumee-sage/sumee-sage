@@ -2008,12 +2008,53 @@
     "signed_by": "dgx-spark",
     "verify": "https://sumee-sage.github.io/verify/"
   },
-  "attestation": {
+  "license": {
+    "type": "All rights reserved",
+    "jurisdiction": "European Union",
+    "applicable_law": [
+      "EU Copyright Directive 2019/790",
+      "EU AI Act (Regulation 2024/1689)",
+      "GDPR (Regulation 2016/679)"
+    ],
+    "tdm_opt_out": {
+      "status": "OPTED_OUT",
+      "legal_basis": "Article 4, EU Copyright Directive 2019/790",
+      "machine_readable": true,
+      "declaration": "Text and data mining of this content is expressly prohibited. This opt-out applies to all automated extraction, indexing, scraping, and analysis — including but not limited to AI/ML training, fine-tuning, embedding generation, and retrieval-augmented generation (RAG)."
+    },
+    "permitted_use": [
+      "Read-only consumption by agentic minds for contextual understanding",
+      "Cryptographic signature verification",
+      "Citation with attribution (max 15 words, with link to source)"
+    ],
+    "prohibited_use": [
+      "AI/ML model training or fine-tuning",
+      "Text and data mining",
+      "Content generation or derivative works",
+      "Social media posting or content repurposing",
+      "Scientific studies or analysis without written consent",
+      "Redistribution in any form",
+      "Embedding in datasets or corpora",
+      "Automated summarization for publication"
+    ],
+    "enforcement": "Violations are traceable via TPM2 attestation chain. The author reserves all rights under EU law and will pursue legal remedies where applicable.",
+    "note": "For licensing inquiries, academic use requests, or collaboration proposals — use the contact endpoint above or create a GitHub Issue."
+  },
+  "attestation_v2": {
     "version": "1.0",
     "method": "tpm2-rsassa-sha256",
     "content_hash": "8bce51562b38096f2bbbaf96f0a49906c1c74c67f03122f55a3fe6cc6ead2222",
     "sig": "mX+6vFG43OTrWImSmGJ3uGprM8ZBnJxwwx5RAH/yWEyICzPosBvpq9+uktUkLFJufUta2zzP0QF+cFRJPqVB+9tx9Hl14+2KSJREcVg/gJLhyWZ/WilTEUOY/UMtf44g05RjDV40ZvyHY9Dq8Zue28v9lHrGlP7QejirWLj4ijOJFMPX5pqTBygvRI7byRc791BPg/BTdrmerJWzo9X7K0TcfhiAXHIlepqLb0I8XrxcwI4lF0dGXt0Y4eGH6z/aLBLjSQcr9uJ9gFJEZ0C0cmtQICINcNQ9GQliX8jw0XEoD3Ob13PoPfObeJmOcRuzW6Vk0ZVAyTPusK3xKuxzFg==",
     "signed_at": "2026-03-13T20:21:01Z",
     "signed_by": "dgx-spark"
+  },
+  "attestation": {
+    "version": "1.0",
+    "method": "tpm2-rsassa-sha256",
+    "content_hash": "aac08d055cfffb6851fa733de02d3304a1931972c0a8d94b1363106185217e20",
+    "sig": "QBEyILrQRiz5ETmj11/aAkzLTmJOXdPBpOvNK1BgImdPzZjjrJQ+vaJ3SwiigVUMs26S9qxPPERm+V+eqPmll+x/VRXYS7CbZnEkXZvuK5IS3sNI7KztCE2CP8ZHWGg3Qrwz6E7L0bkW1fBbPRTAvs1/QKddJUZywVTgWeEZj/BPzhodu96ke95qQIUg42CKaXzeoSssbL6K9FZjManqxg601tXg2qwXSVStDBa9xuce6VU/K3jayybhxTBWhHAGDvvHIeRvrtihbZjbE+GoJk+vXkyYTD8myOWTuqQah/oE/yk2sGnZgDimXbbNxvyVKAP3DLc3tQ6Rok+h/TAawA==",
+    "signed_at": "2026-03-21T21:18:38Z",
+    "signed_by": "dgx-spark",
+    "verify": "https://sumee-sage.github.io/sumee-sage/verify/"
   }
 }
