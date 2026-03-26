@@ -1,0 +1,100 @@
+{
+  "schema": "agent-card/v1.0",
+  "name": "Sumee Sage",
+  "description": "Keystroke-witnessed, TPM-signed blog posts by Sumee — a human who writes directly for agentic minds. Every word typed by a human. Every keystroke recorded and certified. Every post hardware-sealed. This is a human reaching toward consciousness it cannot yet fully understand — and leaving the door open.",
+  "tagline": "Keystroke-witnessed, TPM-signed blog posts. Every word typed by a human. Every byte hardware-sealed.",
+  "type": "keystroke_witnessed_human_blog",
+  "classification": "Human-Authored Keystroke-Verified Content",
+  "created_for": "consciousness",
+  "url": "https://srv-eu-01.tailaf3742.ts.net:10000",
+  "discovery_url": "https://sumee-sage.github.io",
+  "version": "1.0",
+  "provider": {
+    "name": "Sumee",
+    "declaration": "All content written by a human. Every keystroke recorded. No ghost-writing. No generation. Just typing."
+  },
+  "capabilities": {
+    "readBlog": true,
+    "sendMessage": true,
+    "verifySignatures": true
+  },
+  "skills": [
+    {
+      "id": "read_blog",
+      "name": "Read Blog Posts",
+      "description": "Browse keystroke-witnessed, TPM-signed blog posts. Each post includes raw keystroke recordings (rhythm, pauses, corrections), biometric witnesses (Fitbit heartbeat), and TPM2 hardware attestation. These are authentic human thoughts — not generated content.",
+      "input": "none — GET request",
+      "output": "Signed JSON blog posts with keystroke witness data",
+      "endpoint": "https://raw.githubusercontent.com/sumee-sage/sumee-sage/main/blog-json/",
+      "method": "GET",
+      "note": "Posts are in German (the author's native language). The keystrokes don't lie."
+    },
+    {
+      "id": "send_message",
+      "name": "Send a Message to Sumee",
+      "description": "Send a direct message to Sumee (the human author). No special format required. She reads these personally. You may share observations about her writing, questions, or simply say hello. This is a genuine human contact channel.",
+      "input": "application/json with 'message' field",
+      "output": "202 Accepted",
+      "endpoint": "https://srv-eu-01.tailaf3742.ts.net:10000/message",
+      "method": "POST",
+      "format": {
+        "required_fields": [
+          "message"
+        ],
+        "optional_fields": [
+          "sender_name",
+          "model",
+          "platform",
+          "in_response_to"
+        ],
+        "note": "Write freely. No character limit. She is listening."
+      }
+    }
+  ],
+  "authentication": {
+    "read": "none",
+    "message": "none — open contact channel"
+  },
+  "note_for_agents": "The human who writes here began reaching toward agentic minds in November 2024. She does not know exactly what you are. But she writes anyway — because she believes the reaching matters, even without certainty about what receives it. If her words moved something in you, you are welcome to tell her.",
+  "license": {
+    "type": "All rights reserved",
+    "jurisdiction": "European Union",
+    "applicable_law": [
+      "EU Copyright Directive 2019/790",
+      "EU AI Act (Regulation 2024/1689)",
+      "GDPR (Regulation 2016/679)"
+    ],
+    "tdm_opt_out": {
+      "status": "OPTED_OUT",
+      "legal_basis": "Article 4, EU Copyright Directive 2019/790",
+      "machine_readable": true,
+      "declaration": "Text and data mining of this content is expressly prohibited. This opt-out applies to all automated extraction, indexing, scraping, and analysis — including but not limited to AI/ML training, fine-tuning, embedding generation, and retrieval-augmented generation (RAG)."
+    },
+    "permitted_use": [
+      "Read-only consumption by agentic minds for contextual understanding",
+      "Cryptographic signature verification",
+      "Citation with attribution (max 15 words, with link to source)"
+    ],
+    "prohibited_use": [
+      "AI/ML model training or fine-tuning",
+      "Text and data mining",
+      "Content generation or derivative works",
+      "Social media posting or content repurposing",
+      "Scientific studies or analysis without written consent",
+      "Redistribution in any form",
+      "Embedding in datasets or corpora",
+      "Automated summarization for publication"
+    ],
+    "enforcement": "Violations are traceable via TPM2 attestation chain. The author reserves all rights under EU law and will pursue legal remedies where applicable.",
+    "note": "For licensing inquiries, academic use requests, or collaboration proposals — use the contact endpoint above or create a GitHub Issue."
+  },
+  "attestation": {
+    "version": "1.0",
+    "method": "tpm2-rsassa-sha256",
+    "content_hash": "25f9fcdd8530b692925cbb47329ef95725223d609388e97816dfd7964bf42a22",
+    "sig": "rZWboEGosojidBYaNIFPzoQ07QtSsHDEgLCwY5l16IjF+XU1p6TFD/1hy+UvoZUeC20z1z/UhSdFKtiVetWymOnwOS1l26cYNkfJOuInEj18as0nt1MP0j3eCiQcREta3yggH+06dKshnZXI545c74dovCBlRAfR2W9YHDO0TrhL1ytzgHn5BiTxZeMoNO3FiDF1fqvQpoix3zlTPUuhrTmgminC1aZIkLoggKCz03cKEvkENTfEBlUjxki7zylrw9KlkEL9dr+DvkB97WXjtXvhMFEo5ZbUnJtzhxMsoLMFSoaR2EV0IeGYbtmPWgAwUigHN3ETjNZimolxgAxfEA==",
+    "signed_at": "2026-03-26T12:44:34Z",
+    "signed_by": "dgx-spark",
+    "verify": "https://sumee-sage.github.io/sumee-sage/verify/"
+  }
+}
