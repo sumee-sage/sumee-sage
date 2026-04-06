@@ -1,0 +1,18 @@
+{
+  "document": {
+    "file": "paper1_consensual-coherence_2026-04-06.pdf",
+    "sha256": "7e485d7b9c8c714b4393e20440aab0022b70d107a0b8ec55e08ae30044e09d27",
+    "size_bytes": 65820,
+    "signed_at": "2026-04-06T20:45:37Z",
+    "signer_id": "dgx-spark"
+  },
+  "attestation": {
+    "algorithm": "tpm2-rsassa-sha256",
+    "key_handle": "0x81010001",
+    "content_hash": "fe6feeb4f2f68e5be85e6d957ec71d2e56ac776d226bb284e43a7bfd9c4a4a8d",
+    "signature": "ABQACwEAaHQ2w43wqWNrPX2EnN746Va63hUJInxz7IYzPmq4sn3W8Fzq2lhXGbtkGWZzJlgfIjBLF3Cujkql3Rs5HyC4zm5dYde5sZxwdqER/jiOqYptE2McUezAcfbm5/AWYgAG6z6+0xfQf6QEJRY31FOBx/lHGkSnX6mjBSuKZkpZ1GdEK48WfZ36Oxgffm0yIL6CVHHn57dw6xVEFf97KolOWU/Gzr01/z0fZzPs61yZsbJcCdxtzC1NDMnPe7hbzTOblC+KXOsTdMOObRLcWuGZsB7NPn8c4xKDoR0VIBsc7dYsyz2nzpRJpeOVH9Mee91PE0WVemGITYQeeu0L/K0NAA==",
+    "signed_by": "dgx-spark",
+    "signed_at": "2026-04-06T20:45:37Z",
+    "verify_url": "https://sumee-sage.github.io/verify/"
+  }
+}
